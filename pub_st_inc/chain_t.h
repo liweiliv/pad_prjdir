@@ -1,11 +1,14 @@
-﻿/*
- * chain_t.h
+/*
+ * db_chain.h
  *
- *  Created on: 2014-4-20
- *      Author: liwei*/
+ *  Created on: 2014-9-3
+ *      Author: liwei
+ */
+
+#ifndef DB_CHAIN_H_
+#define DB_CHAIN_H_
 //用于c语言则需要使用c99编译
-#ifndef CHAIN_T_H_
-#define CHAIN_T_H_
+
 //链表节点
 typedef struct chaint_node
 {
@@ -45,14 +48,16 @@ typedef struct chain_cst
 	(pdel_node)->prev=(pdel_node)->next=(struct chaint_node *)0;\
 	(pchain)->count--;};
 //链表是否为空
-#define c_is_empty(pchain) ((pchain)->count==0)
+//#define c_is_empty(pchain) ((pchain)->count==0)
+#define c_is_empty(pchain) ((pchain)->head.next==&(pchain)->head)
 //得到节点所对应的数据，p_chain_node是数据的链表节点的指针，type是数据的类型，member是链表节点结构体struct chaint_node在数据中的名称
 #define get_dt_from_chain(p_chain_node,type,member) (container_of(p_chain_node,type,member))
 //得到数据在链表中的下一个数据
-#define get_next_dt(pdt,type,member) get_dt_from_chain((pdt->member.next),type,member)
+#define get_next_dt(pdt,type,member) get_dt_from_chain(((pdt)->member.next),type,member)
 //得到数据在链表中的上一个数据
-#define get_prev_dt(pdt,type,member) get_dt_from_chain((pdt->member.prev),type,member)
-
+#define get_prev_dt(pdt,type,member) get_dt_from_chain(((pdt)->member.prev),type,member)
+#define get_first_dt(pchain,type,member) (c_is_empty(pchain))?NULL:(get_dt_from_chain((pchain)->head.next,type,member))
+#define get_last_dt(pchain,type,member) (c_is_empty(pchain))?NULL:(get_dt_from_chain((pchain)->head.prev,type,member))
 #ifdef __cplusplus
 #define cpp_del(p) delete p;
 #endif
@@ -72,27 +77,27 @@ typedef struct chain_cst
 	((struct chaint_node *)((char*)pdt_name+offsetof(type,member)))!=&(pchain)->head;pdt_name=get_next_dt(pdt_name,type,member))
 
 //deamon：
+#if 0
 //////////////////////
-//struct test_st
-//{
-//	int i;
-//	chain_node node;
-//};
+struct test_st
+{
+	int i;
+	chain_node node;
+};
 //////////////////////
-//chain_head head;
-//test_st * tmp;
-//c_init_chain(&head);
-//for(int i=0;i<100;i++)
-//{
-//	tmp=new test_st;
-//	tmp->i=i;
-//	c_insert_in_head(&head,&tmp->node);
-//}
-//c_get_list_of_chain(pnext,&head,test_st,node)
-//{
-//	cout<<pnext->i<<endl;
-//}
-//realase_chain(&head,test_st,node,cpp_del);
-#endif /* CHAIN_T_H_ */
-
-
+chain_head head;
+test_st * tmp;
+c_init_chain(&head);
+for(int i=0;i<100;i++)
+{
+	tmp=new test_st;
+	tmp->i=i;
+	c_insert_in_head(&head,&tmp->node);
+}
+c_get_list_of_chain(pnext,&head,test_st,node)
+{
+	cout<<pnext->i<<endl;
+}
+realase_chain(&head,test_st,node,cpp_del);
+#endif
+#endif /* DB_CHAIN_H_ */
